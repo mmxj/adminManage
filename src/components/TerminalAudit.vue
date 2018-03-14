@@ -3,17 +3,29 @@
     <div class="form-wrap">
       <el-form :inline="true">
         <el-form-item label="商户名称" label-width="100px">
-          <el-input v-model="form.name" placeholder="请输入商户名称"></el-input>
+          <el-input v-model="form.merchantName" placeholder="请输入商户名称"></el-input>
+          <!--<GetCompany :data="company" :holder="'请输入商户名称'"></GetCompany>-->
         </el-form-item>
-        <el-form-item label="终端编号" label-width="100px">
-          <el-input v-model="form.number" placeholder="请输入终端编号"></el-input>
+        <el-form-item label="PSAM卡号" label-width="100px">
+          <el-input v-model="form.pSimNo" placeholder="请输入PSAM卡号"></el-input>
         </el-form-item>
-        <el-form-item label="安装地址" label-width="100px">
-          <el-input v-model="form.address" placeholder="请输入安装地址"></el-input>
+        <el-form-item label="终端状态" label-width="100px">
+          <!--<el-input v-model="form.address" placeholder="请输入终端状态"></el-input>-->
+          <el-select v-model="form.auditFlag" clearable placeholder="请选择">
+            <el-option
+              v-for="item in enableFlagOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="终端号" label-width="100px">
+          <el-input v-model="form.terminalNo" placeholder="请输入终端号"></el-input>
         </el-form-item>
         <el-form-item>
           <div class="button-wrap">
-            <el-button>查询</el-button>
+            <el-button @click="sreach">查询</el-button>
           </div>
         </el-form-item>
       </el-form>
@@ -26,14 +38,14 @@
         :row-key="getRowKeys"
         :expand-row-keys="expands"
       >
-        <el-table-column align="center" label="归属商户" prop="mercial" min-width="100"></el-table-column>
-        <el-table-column align="center" label="商户编号" prop="number" min-width="100"></el-table-column>
-        <el-table-column align="center" label="终端编号" prop="termainalNumber" min-width="100"></el-table-column>
-        <el-table-column align="center" label="终端密钥索引" prop="index" min-width="130"></el-table-column>
-        <el-table-column align="center" label="PSAM卡号" prop="psam" min-width="120"></el-table-column>
+        <el-table-column align="center" label="归属商户" prop="companyName" min-width="100"></el-table-column>
+        <el-table-column align="center" label="商户号" prop="merchantNo" min-width="100"></el-table-column>
+        <el-table-column align="center" label="终端编号" prop="terminalNo" min-width="100"></el-table-column>
+        <el-table-column align="center" label="终端密钥索引" prop="mainKeyId" min-width="130"></el-table-column>
+        <el-table-column align="center" label="PSAM卡号" prop="pSimNo" min-width="120"></el-table-column>
         <el-table-column align="center" label="安装地址" prop="address" min-width="100"
                          show-overflow-tooltip></el-table-column>
-        <el-table-column align="center" label="收单机构" prop="acquirer" min-width="100"></el-table-column>
+        <el-table-column align="center" label="收单机构" prop="acquirerName" min-width="100"></el-table-column>
         <el-table-column align="center" label="详情" min-width="100">
           <template slot-scope="props">
             <span class="button" @click="show(props.$index)">{{props.$index == expands[0] ? '收起' : '展开'}}</span>
@@ -41,14 +53,14 @@
         </el-table-column>
         <el-table-column align="center" label="操作" min-width="100">
           <template slot-scope="props">
-            <span class="button" @click="outerVisible = true">审核</span>
+            <span class="button" @click="audit(props.row)">审核</span>
           </template>
         </el-table-column>
         <el-table-column type="expand" max-width="0%">
           <template slot-scope="props">
             <el-form label-position="left" :inline="true" class="demo-table-expand">
               <el-form-item label="维护公司" label-width="100px">
-                <span>{{props.row.maintain}}</span>
+                <span>{{props.row.maintainCompany}}</span>
               </el-form-item>
               <el-form-item label="终端经纬度" label-width="100px">
                 <span>{{props.row.position}}</span>
@@ -57,19 +69,16 @@
                 <span>{{props.row.agency}}</span>
               </el-form-item>
               <el-form-item label="开通日期" label-width="100px">
-                <span>{{props.row.createDate}}</span>
-              </el-form-item>
-              <el-form-item label="商户主营业务" label-width="100px">
-                <span>{{props.row.business}}</span>
+                <span>{{props.row.sfsCreate}}</span>
               </el-form-item>
               <el-form-item label="终端型号" label-width="100px">
                 <span>{{props.row.model}}</span>
               </el-form-item>
               <el-form-item label="终端厂家" label-width="100px">
-                <span>{{props.row.manufacturers}}</span>
+                <span>{{props.row.terminalCompany}}</span>
               </el-form-item>
               <el-form-item label="终端状态" label-width="100px">
-                <span>{{props.row.status}}</span>
+                <span>{{props.row.auditFlag}}</span>
               </el-form-item>
               <el-form-item label="详细安装地址" label-width="100px" style="width:100%">
                 <span>{{props.row.address}}</span>
@@ -85,47 +94,46 @@
       <el-dialog title="终端审核" :visible.sync="outerVisible">
         <el-form :model="formData" inline>
           <el-form-item label="归属商户" :label-width="formLabelWidth">
-            <el-input readonly size="small" v-model="formData.name" auto-complete="off"></el-input>
+            <el-input readonly size="small" v-model="formData.companyName" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="PSAM卡号" :label-width="formLabelWidth">
-            <el-input readonly size="small" v-model="formData.psam" auto-complete="off"></el-input>
+            <el-input readonly size="small" v-model="formData.pSimNo" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="安装地址" :label-width="formLabelWidth">
             <el-input readonly size="small" v-model="formData.address" auto-complete="off"
                       class="address-input"></el-input>
           </el-form-item>
           <el-form-item label="维护公司" :label-width="formLabelWidth">
-            <el-input readonly size="small" v-model="formData.maintain" auto-complete="off"></el-input>
+            <el-input readonly size="small" v-model="formData.maintainCompany" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="收单机构" :label-width="formLabelWidth">
-            <el-input readonly size="small" v-model="formData.acquirer" auto-complete="off"></el-input>
+            <el-input readonly size="small" v-model="formData.acquirerName" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="代理申请主体" :label-width="formLabelWidth">
             <el-input readonly size="small" v-model="formData.agency" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="归属地区" :label-width="formLabelWidth">
-            <el-input readonly size="small" v-model="formData.affiliation" auto-complete="off"></el-input>
+            <div class="form-select">
+              <Province :disabled="true" :propdata="formData" :startArea="startAreas"></Province>
+            </div>
           </el-form-item>
           <el-form-item label="开通日期" :label-width="formLabelWidth">
-            <el-input readonly size="small" v-model="formData.createDate" auto-complete="off"></el-input>
+            <el-input readonly size="small" v-model="formData.openDate" auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item label="商户编码" :label-width="formLabelWidth">
-            <el-input readonly size="small" v-model="formData.commercialCode" auto-complete="off"></el-input>
+          <el-form-item label="商户号" :label-width="formLabelWidth">
+            <el-input readonly size="small" v-model="formData.merchantNo" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="申请日期" :label-width="formLabelWidth">
-            <el-input readonly size="small" v-model="formData.applicationDate" auto-complete="off"></el-input>
+            <el-input readonly size="small" v-model="formData.sfsCreate" auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item label="终端编号" :label-width="formLabelWidth">
-            <el-input readonly size="small" v-model="formData.TerminalCode" auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="商户主营业务" :label-width="formLabelWidth">
-            <el-input readonly size="small" v-model="formData.business" auto-complete="off"></el-input>
+          <el-form-item label="终端号" :label-width="formLabelWidth">
+            <el-input readonly size="small" v-model="formData.terminalNo" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="终端密钥索引" :label-width="formLabelWidth">
-            <el-input readonly size="small" v-model="formData.secretKey" auto-complete="off"></el-input>
+            <el-input readonly size="small" v-model="formData.mainKeyId" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="终端厂家" :label-width="formLabelWidth">
-            <el-input readonly size="small" v-model="formData.manufacturers" auto-complete="off"></el-input>
+            <el-input readonly size="small" v-model="formData.terminalCompany" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="终端型号" :label-width="formLabelWidth">
             <el-input readonly size="small" v-model="formData.model" auto-complete="off"></el-input>
@@ -133,14 +141,14 @@
         </el-form>
         <div slot="footer" class="deal">
           <span class="radio-title"><i>*</i>审核结果:</span>
-          <el-radio v-model="radio" label="1">审核通过</el-radio>
-          <el-radio v-model="radio" label="2">审核不通过</el-radio>
+          <el-radio v-model="formData.auditFlag" label="1">审核通过</el-radio>
+          <el-radio v-model="formData.auditFlag" label="2">审核不通过</el-radio>
           <div>
             <span style="vertical-align: top;margin-top:20px;display:inline-block">备注：</span>
             <el-input type="textarea"
                       :autosize="{ minRows: 4}"
                       placeholder="请输入内容"
-                      v-model="textarea"
+                      v-model="formData.summary"
                       resize="none"
                       style="width: 650px;margin-top:10px"
             ></el-input>
@@ -148,7 +156,7 @@
         </div>
         <div slot="footer" class="dialog-footer" center>
           <el-button @click="outerVisible = false">关闭</el-button>
-          <el-button @click="outerVisible = false">确定</el-button>
+          <el-button @click="submit">确定</el-button>
         </div>
       </el-dialog>
     </div>
@@ -159,203 +167,33 @@
         :current-page="currentPage"
         :page-size="10"
         layout="total, prev, pager, next, jumper"
-        :total="100">
+        :total="total">
       </el-pagination>
     </div>
   </div>
 </template>
 <script>
+  import unit from '@/unit/unit';
+  import Province from '@/common/Province';
   export default{
+    components: {
+      Province
+    },
     data(){
       return {
+        session: sessionStorage.getItem('session'),
+        total: 0,//总条数
+        pageNum: 1,//单前页码
+        startAreas: null,//初始地区
         form: {},
         currentPage: 1,
         textarea: null,
         formData: {},
         radio: null,
+        enableFlagOptions: [{value: '0', label: '待审核'}, {value: '2', label: '审核不通过'}],
         outerVisible: false,
         formLabelWidth: '100px',
-        tableData: [
-          {
-            id: 1,
-            mercial: 1111,
-            number: 1111,
-            termainalNumber: 11111,
-            index: 0,
-            psam: 1111,
-            address: '11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111',
-            acquirer: 11111,
-            maintain: 11111,
-            position: 111111,
-            agency: 111111,
-            createDate: 11111,
-            business: 111111,
-            model: 11111,
-            manufacturers: 111111,
-            status: 11111
-          },
-          {
-            id: 2,
-            mercial: 1111,
-            number: 1111,
-            termainalNumber: 11111,
-            index: 1,
-            psam: 1111,
-            address: 1111,
-            acquirer: 11111,
-            maintain: 11111,
-            position: 111111,
-            agency: 111111,
-            createDate: 11111,
-            business: 111111,
-            model: 11111,
-            manufacturers: 111111,
-            status: 11111
-          },
-          {
-            id: 3,
-            mercial: 1111,
-            number: 1111,
-            termainalNumber: 11111,
-            index: 2,
-            psam: 1111,
-            address: 1111,
-            acquirer: 11111,
-            maintain: 11111,
-            position: 111111,
-            agency: 111111,
-            createDate: 11111,
-            business: 111111,
-            model: 11111,
-            manufacturers: 111111,
-            status: 11111
-          },
-          {
-            id: 4,
-            mercial: 1111,
-            number: 1111,
-            termainalNumber: 11111,
-            index: 3,
-            psam: 1111,
-            address: 1111,
-            acquirer: 11111,
-            maintain: 11111,
-            position: 111111,
-            agency: 111111,
-            createDate: 11111,
-            business: 111111,
-            model: 11111,
-            manufacturers: 111111,
-            status: 11111
-          },
-          {
-            id: 5,
-            mercial: 1111,
-            number: 1111,
-            termainalNumber: 11111,
-            index: 4,
-            psam: 1111,
-            address: 1111,
-            acquirer: 11111,
-            maintain: 11111,
-            position: 111111,
-            agency: 111111,
-            createDate: 11111,
-            business: 111111,
-            model: 11111,
-            manufacturers: 111111,
-            status: 11111
-          },
-          {
-            id: 6,
-            mercial: 1111,
-            number: 1111,
-            termainalNumber: 11111,
-            index: 5,
-            psam: 1111,
-            address: 1111,
-            acquirer: 11111,
-            maintain: 11111,
-            position: 111111,
-            agency: 111111,
-            createDate: 11111,
-            business: 111111,
-            model: 11111,
-            manufacturers: 111111,
-            status: 11111
-          },
-          {
-            id: 7,
-            mercial: 1111,
-            number: 1111,
-            termainalNumber: 11111,
-            index: 6,
-            psam: 1111,
-            address: 1111,
-            acquirer: 11111,
-            maintain: 11111,
-            position: 111111,
-            agency: 111111,
-            createDate: 11111,
-            business: 111111,
-            model: 11111,
-            manufacturers: 111111,
-            status: 11111
-          },
-          {
-            id: 8,
-            mercial: 1111,
-            number: 1111,
-            termainalNumber: 11111,
-            index: 7,
-            psam: 1111,
-            address: 1111,
-            acquirer: 11111,
-            maintain: 11111,
-            position: 111111,
-            agency: 111111,
-            createDate: 11111,
-            business: 111111,
-            model: 11111,
-            manufacturers: 111111,
-            status: 11111
-          }, {
-            id: 9,
-            mercial: 1111,
-            number: 1111,
-            termainalNumber: 11111,
-            index: 8,
-            psam: 1111,
-            address: 1111,
-            acquirer: 11111,
-            maintain: 11111,
-            position: 111111,
-            agency: 111111,
-            createDate: 11111,
-            business: 111111,
-            model: 11111,
-            manufacturers: 111111,
-            status: 11111
-          },
-          {
-            id: 10,
-            mercial: 1111,
-            number: 1111,
-            termainalNumber: 11111,
-            index: 9,
-            psam: 1111,
-            address: 1111,
-            acquirer: 11111,
-            maintain: 11111,
-            position: 111111,
-            agency: 111111,
-            createDate: 11111,
-            business: 111111,
-            model: 11111,
-            manufacturers: 111111,
-            status: 11111
-          },
-        ],
+        tableData: [],
         getRowKeys(row) {
           return row.index
         },
@@ -364,7 +202,9 @@
     },
     methods: {
       handleCurrentChange(val){
-        console.log(`当前页: ${val}`);
+//        console.log(`当前页: ${val}`);
+        this.pageNum = val;
+        this.getTerminal();
       },
       show(data){
 
@@ -375,9 +215,117 @@
           this.expands = [];
         }
 
-      }
+      },
+      getTerminal(){ //获取终端信息
+        var vm = this;
+        vm.tableData = [];
+        var getterminal = new RemoteCall();
+        getterminal.init({
+          router: '/base/terminal/get',
+          session: vm.session,
+          data: {
+            pageInfo: {
+              pageSize: 10,
+              pageNum: vm.pageNum
+            },
+            auditFlagIn: '0,2'
+          },
+          callback: function (data) {
+            if (data.ret.errorCode === 0) {
+              if (data.pageInfo.total) {
+                if (data.pageInfo.total > 0) {
+                  vm.total = data.pageInfo.total
+                }
+              } else if (data.pageInfo.total === 0) {
+                vm.total = 0
+              }
+              ;
+              vm.tableData = [];
+              data.rows.forEach(function (item, i) {
+                item.index = i;
+                item.auditFlag = unit.auditFlag(item.auditFlag);
+                vm.$set(vm.tableData, i, item)
+              })
+              vm.expands = [];
+            }
+          }
+        })
+      },//获取终端信息
+      audit(data){//审核显示界面
+        var vm = this;
+        this.formData = data;
+        this.startAreas = this.formData.areaId;
+        this.outerVisible = true;
+//        console.log(data);
+
+
+      },
+      submit(){//提交修改
+        var vm = this;
+        unit.removeEmptyString(vm.formData);
+        var submitUpdata = new RemoteCall();
+        submitUpdata.init({
+          router: '/base/terminal/update',
+          session: vm.session,
+          data: vm.formData,
+          callback: function (data) {
+            console.log(data);
+            if (data.ret.errorCode === 0) {
+              vm.$alert('修改成功', '提示', {
+                confirmButtonText: '确定',
+                callback: function () {
+                  vm.outerVisible = false;
+                  vm.getTerminal();
+                }
+              })
+            } else {
+              vm.$alert('修改失败' + data.ret.errorMessage, '提示', {
+                confirmButtonText: '确定',
+                callback: function () {
+                  vm.outerVisible = false;
+                  vm.getTerminal();
+                }
+              })
+            }
+          }
+        })
+      },
+      sreach(){//根据条件查询终端信息 缺少地址查询的功能
+//        this.form.companyId=this.company.id;
+        var vm = this;
+        console.log(1111);
+        this.form.pageInfo = {
+          pageSize: 10,
+          pageNum: vm.pageNum
+        };
+        this.form.auditFlagIn = '0,2';
+        unit.removeEmptyString(this.form);
+
+        var searchCompany = new RemoteCall();
+        searchCompany.init({
+          router: '/base/terminal/get',
+          session: vm.session,
+          data: vm.form,
+          callback: function (data) {
+            if (data.pageInfo.total) {
+              if (data.pageInfo.total > 0) {
+                vm.total = data.pageInfo.total
+              }
+            } else if (data.pageInfo.total === 0) {
+              vm.total = 0
+            }
+            vm.tableData = [];
+            data.rows.forEach(function (item, i) {
+              item.index = i;
+              item.auditFlag = unit.auditFlag(item.auditFlag);
+              vm.$set(vm.tableData, i, item)
+            })
+          }
+        })
+      },//根据条件查询
     },
     mounted: function () {
+      this.getTerminal();
     }
   }
 </script>
@@ -400,6 +348,7 @@
   .button-wrap {
     width: 90px;
     text-align: right;
+    margin-left: 30px;
   }
 
   .el-input {
@@ -459,6 +408,7 @@
     color: #1890ff;
     padding: 0 10px;
     cursor: pointer;
+    text-decoration: underline;
   }
 
   .terminalMessage .el-dialog--small {
@@ -466,6 +416,9 @@
     border-radius: 5px;
   }
 
+  /*.terminalMessage .el-dialog__body{*/
+  /*text-align: center;*/
+  /*}*/
   .deal {
     text-align: center;
     padding-bottom: 10px;
@@ -542,5 +495,13 @@
   .terminalMessage .el-dialog--small {
     width: 826px;
     border-radius: 5px;
+  }
+
+  .form-select {
+    width: 220px;
+  }
+
+  .el-dialog .el-input {
+    width: 220px;
   }
 </style>

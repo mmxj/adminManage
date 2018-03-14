@@ -56,22 +56,23 @@
         <el-button class="submit" size="small" @click="submit">确定</el-button>
       </div>
     </div>
+    <!--根据条件查询-->
     <div id="TerminalAudit2">
       <div class="form-wrap">
         <el-form :inline="true">
           <el-form-item label="商户名称" label-width="100px">
-            <!--<el-input v-model="form.name" size="small" placeholder="请输入商户名称"></el-input>-->
-            <GetCompany :data="company3" :holder="'请输入商户名称'"></GetCompany>
+            <el-input v-model="form.merchantName" size="small" placeholder="请输入商户名称"></el-input>
+            <!--<GetCompany :data="company3" :holder="'请输入商户名称'"></GetCompany>-->
           </el-form-item>
-          <el-form-item label="终端编号" label-width="100px">
-            <el-input v-model="form.number" size="small" placeholder="请输入终端编号"></el-input>
+          <el-form-item label="终端号" label-width="100px">
+            <el-input v-model="form.terminalNo" size="small" placeholder="请输入终端编号"></el-input>
           </el-form-item>
           <el-form-item label="安装地址" label-width="100px">
             <el-input v-model="form.address" size="small" placeholder="请输入安装地址"></el-input>
           </el-form-item>
           <el-form-item>
             <div class="button-wrap">
-              <el-button>查询</el-button>
+              <el-button @click="sreach">查询</el-button>
             </div>
           </el-form-item>
         </el-form>
@@ -83,22 +84,35 @@
           style="width:100%"
           :row-key="getRowKeys"
           :expand-row-keys="expands"
+          @selection-change="handleSelectionChange"
+          @filter-change="filterFlag"
         >
-          <el-table-column align="center" label="归属商户" prop="companyName" min-width="100"></el-table-column>
+          <el-table-column v-if="showButton" type="selection" width="55"></el-table-column>
+          <el-table-column align="center" label="归属商户" prop="companyName" min-width="180"></el-table-column>
           <el-table-column align="center" label="PSAM卡号" prop="pSimNo" min-width="120"></el-table-column>
           <el-table-column align="center" label="安装地址" prop="address" min-width="100"
                            show-overflow-tooltip></el-table-column>
-          <el-table-column align="center" label="收单机构" prop="pSimNo" min-width="100"></el-table-column>
-          <el-table-column align="center" label="终端状态" prop="enableFlag" min-width="100"></el-table-column>
+          <el-table-column align="center" label="收单机构" prop="acquirerName" min-width="100"></el-table-column>
+          <el-table-column align="center" label="终端状态"
+                           :filters="[{text:'待审核',value:0},{text:'审核通过',value:1},{text:'审核失败',value:2}]"
+                           column-key="flag"
+                           prop="" min-width="100">
+            <template slot-scope="props">
+              <div class="status-wrap">
+                <i class="circle" :class="circle(props.row.auditFlag)"></i><span>{{props.row.auditFlag}}</span>
+              </div>
+            </template>
+          </el-table-column>
           <el-table-column align="center" label="详情" min-width="100">
             <template slot-scope="props">
               <span class="button" @click="show(props.$index)">{{props.$index == expands[0] ? '收起' : '展开'}}</span>
             </template>
           </el-table-column>
-          <el-table-column align="center" label="操作" min-width="100">
+          <el-table-column align="center" label="操作" min-width="120">
             <template slot-scope="props">
-              <span class="button" @click="deleteDialog = true">删除</span>
-              <span class="button" @click="upData(props.row)">编辑</span>
+              <span :class="props.row.auditFlag=='待审核'||props.row.auditFlag=='审核失败'?'button':'button2'"
+                    @click="upData(props.row)">编辑</span>
+              <span :class="props.row.auditFlag=='待审核'?'button':'button2'" @click="deleteTerminal(props.row)">删除</span>
             </template>
           </el-table-column>
           <el-table-column type="expand">
@@ -130,9 +144,9 @@
                 <el-form-item label="终端号" label-width="100px">
                   <span>{{props.row.terminalNo}}</span>
                 </el-form-item>
-                <el-form-item label="商户主营业务" label-width="100px">
-                  <span>{{props.row.summary}}</span>
-                </el-form-item>
+                <!--<el-form-item label="商户主营业务" label-width="100px">-->
+                <!--<span>{{props.row.summary}}</span>-->
+                <!--</el-form-item>-->
                 <el-form-item label="终端密匙索引" label-width="100px">
                   <span>{{props.row.mainKeyId}}</span>
                 </el-form-item>
@@ -164,7 +178,7 @@
           </div>
           <div slot="footer" class="dialog-footer" center>
             <el-button size="small" @click="deleteDialog = false">取消</el-button>
-            <el-button class="submit" size="small" @click="deleteDialog = false">确定删除</el-button>
+            <el-button class="submit" size="small" @click="deleteItem">确定删除</el-button>
           </div>
         </el-dialog>
       </div>
@@ -186,7 +200,8 @@
               <el-input size="small" v-model="formData.maintainCompany" auto-complete="off"></el-input>
             </el-form-item>
             <el-form-item label="收单机构" :label-width="formLabelWidth">
-              <el-input size="small" v-model="formData.acquirerName" auto-complete="off"></el-input>
+              <GetCompany :data="company4" :start="formData.acquirerName" :type="1" :holder="'请输入收单机构'"></GetCompany>
+              <!--<el-input size="small" v-model="formData.acquirerName" auto-complete="off"></el-input>-->
             </el-form-item>
             <el-form-item label="代理申请主体" :label-width="formLabelWidth">
               <el-input size="small" v-model="formData.agency" auto-complete="off"></el-input>
@@ -221,12 +236,20 @@
           </el-form>
           <div slot="footer" class="dialog-footer" center>
             <el-button size="small" @click="outerVisible = false">关闭</el-button>
-            <el-button class="submit" size="small" @click="submitouterVisible = false">提交申请 </el-button>
+            <el-button class="submit" size="small" @click="submitouterVisible">提交申请 </el-button>
           </div>
         </el-dialog>
       </div>
       <!--分页-->
       <div class="pagination clearfix">
+        <div class="exportpassword">
+          <el-button v-if="!showButton" @click="showButton=!showButton" size="small">导出密匙</el-button>
+          <div v-if="showButton">
+            <el-button size="mini" class="button-mini" type="primary">确定导出</el-button>
+            <el-button size="mini" class="button-mini" @click="showButton=!showButton">取消</el-button>
+            <span class="chose">已选择 <b>{{multipleSelection.length}}</b> 项目</span>
+          </div>
+        </div>
         <el-pagination
           @current-change="handleCurrentChange"
           :current-page="currentPage"
@@ -244,7 +267,7 @@
   import GetCompany from '@/common/GetCompany';
   import ReadArea from '@/common/ReadArea';
   import tanhao from '@/assets/img/tanghao.png';
-  import unit from '@/unit/unit'
+  import unit from '@/unit/unit';
   export default{
     components: {
       Province,
@@ -257,6 +280,7 @@
         company1: {},//商户
         company2: {},//收单机构
         company3: {},//搜索的商户名
+        company4: {},//修改弹窗中的收单机构
         total: 0,//总条数
         pageNum: 1,//单前页码
         deleteDialog: false,
@@ -281,7 +305,11 @@
         getRowKeys(row){
           return row.index
         },
-        expands: []
+        expands: [],
+        deleteId: null,
+        multipleSelection: [],
+        showButton: false,
+        flag: null
       }
     },
     methods: {
@@ -358,7 +386,8 @@
             pageInfo: {
               pageSize: 10,
               pageNum: vm.pageNum
-            }
+            },
+            auditFlagIn: vm.flag
           },
           callback: function (data) {
             if (data.ret.errorCode === 0) {
@@ -369,8 +398,11 @@
               } else if (data.pageInfo.total === 0) {
                 vm.total = 0
               }
+              ;
+              vm.tableData = [];
               data.rows.forEach(function (item, i) {
-                item.index = i
+                item.index = i;
+                item.auditFlag = unit.auditFlag(item.auditFlag);
                 vm.$set(vm.tableData, i, item)
               })
             }
@@ -378,12 +410,119 @@
         })
       },//获取终端信息
       upData(data){
-        var vm = this;
-        for (var i in data) {
-          vm.$set(vm.formData, i, data[i])
+        if (data.auditFlag == '待审核' || data.auditFlag == '审核失败') {
+          var vm = this;
+          for (var i in data) {
+            vm.$set(vm.formData, i, data[i])
+          }
+          this.startAreas = vm.formData.areaId;
+          vm.outerVisible = true
         }
-        this.startAreas = vm.formData.areaId;
-        vm.outerVisible = true
+      },
+      sreach(){//根据条件查询终端信息 缺少地址查询的功能
+//        this.form.companyId=this.company3.id;
+        var vm = this;
+        this.form.pageInfo = {
+          pageSize: 10,
+          pageNum: vm.pageNum
+        };
+//        this.form.auditFlagIn='0,2';
+        unit.removeEmptyString(this.form);
+        var searchCompany = new RemoteCall();
+        searchCompany.init({
+          router: '/base/terminal/get',
+          session: vm.session,
+          data: vm.form,
+          callback: function (data) {
+            if (data.pageInfo.total) {
+              if (data.pageInfo.total > 0) {
+                vm.total = data.pageInfo.total
+              }
+            } else if (data.pageInfo.total === 0) {
+              vm.total = 0
+            }
+            vm.tableData = [];
+            data.rows.forEach(function (item, i) {
+              item.index = i
+              item.auditFlag = unit.auditFlag(item.auditFlag);
+              vm.$set(vm.tableData, i, item)
+            })
+          }
+        })
+      },//根据条件查询
+      submitouterVisible(){//修改终端信息
+        var vm = this;
+        vm.formData.acquirerName = vm.company4.name;
+        vm.formData.acquirerId = vm.company4.id;
+        unit.removeEmptyString(vm.formData);
+        var submitUpdata = new RemoteCall();
+        submitUpdata.init({
+          router: '/base/terminal/update',
+          session: vm.session,
+          data: vm.formData,
+          callback: function (data) {
+            console.log(data);
+            if (data.ret.errorCode === 0) {
+              vm.$alert('修改成功', '提示', {
+                confirmButtonText: '确定',
+                callback: function () {
+                  vm.outerVisible = false;
+                  vm.getTerminal();
+                }
+              })
+            }
+          }
+        })
+
+      },//提交修改
+      deleteTerminal(data){
+        if (data.auditFlag == '待审核') {
+          this.deleteId = data.id;
+          this.deleteDialog = true
+        }
+      },
+      deleteItem(){
+        var vm = this;
+        var del = new RemoteCall();
+        del.init({
+          router: '/base/terminal/delete',
+          session: vm.session,
+          data: {
+            id: vm.deleteId
+          },
+          callback: function (data) {
+            console.log(data);
+            vm.getTerminal();
+          }
+        })
+        this.deleteDialog = false
+      },
+      handleSelectionChange(val){//将选中的项目放到其他数组
+        this.multipleSelection = val;
+      },
+      filterFlag(value){//筛选过滤
+        this.flag = null;
+        for (var i = 0; i < value.flag.length; i++) {
+          if (this.flag == null) {
+            this.flag += value.flag[i];
+          } else {
+            this.flag += ',' + value.flag[i];
+          }
+
+        }
+        if (this.flag != null) {
+          this.flag = this.flag.toString();
+        }
+        this.getTerminal();
+      },
+      circle(name){//返回对应的颜色类名
+        if (name == '待审核') {
+          return 'blueCircle'
+        } else if (name == '审核通过') {
+          return 'greenCircle'
+        } else {
+          return 'redCircle'
+        }
       }
     },
     mounted: function () {
@@ -447,6 +586,10 @@
     .el-button {
       width: 100px;
     }
+    .button-mini {
+      width: auto;
+      padding: 7px 10px;
+    }
     .button {
       .el-button {
         padding: 8px 0;
@@ -479,8 +622,15 @@
       margin: 20px 0;
       .button {
         color: #1890ff;
-        padding: 0 10px;
+        padding: 0 5px;
         cursor: pointer;
+        text-decoration: underline;
+      }
+      .button2 {
+        color: #aaaaaa;
+        padding: 0 5px;
+        cursor: not-allowed;
+        text-decoration: line-through;
       }
       .el-form-item {
         span {
@@ -518,7 +668,33 @@
       padding: 0;
       display: none;
     }
-
+    .circle {
+      display: inline-block;
+      vertical-align: middle;
+      width: 6px;
+      height: 6px;
+      background: #000;
+      -webkit-border-radius: 6px;
+      -moz-border-radius: 6px;
+      border-radius: 6px;
+      position: relative;
+      top: -1px;
+      margin-right: 3px;
+    }
+    .greenCircle {
+      background: #228B22;
+    }
+    .blueCircle {
+      background: #0F8DFF;
+    }
+    .redCircle {
+      background: #FB3C3B;
+    }
+    .status-wrap {
+      width: 80px;
+      text-align: left;
+      margin: 0 auto;
+    }
   }
 
   .demo-table-expand {
@@ -566,9 +742,23 @@
     .el-dialog__body {
       padding: 20px 20px;
     }
+
   }
 
+  .exportpassword {
+    display: inline-block;
+    margin-left: 30px;
+  }
   .form-select {
     width: 250px;
+  }
+
+  .chose {
+    font-size: 14px;
+    color: #666;
+    vertical-align: middle;
+    b {
+      color: #1890ff
+    }
   }
 </style>

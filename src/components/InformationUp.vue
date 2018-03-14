@@ -23,7 +23,7 @@
               <input type="file" name="file" ref="pdfInput"
                      style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;"
                      v-on:change="pdfUrl" accept=".pdf">
-              <input type="text" name="upload_type" value="4" style="display:none">
+              <input type="text" name="upload_type" value="3" style="display:none">
             </form>
           </el-col>
         </el-row>

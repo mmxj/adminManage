@@ -1,15 +1,18 @@
 <template>
   <div id="Provice">
-    <el-select size="small" v-model="propdata.provinceId" @change="provinceChange" @clear="clearData('province')"
+    <el-select :disabled="disabled" size="small" v-model="propdata.provinceId" @change="provinceChange"
+               @clear="clearData('province')"
                clearable placeholder="请选择">
       <el-option v-for="item in data.provinceData" :key="item.value" :label="item.label"
                  :value="item.value"></el-option>
     </el-select>
-    <el-select size="small" v-model="propdata.cityId" @change="cityChange" @clear="clearData('city')" clearable
+    <el-select :disabled="disabled" size="small" v-model="propdata.cityId" @change="cityChange"
+               @clear="clearData('city')" clearable
                placeholder="请选择">
       <el-option v-for="item in data.cityData" :key="item.value" :label="item.label" :value="item.value"></el-option>
     </el-select>
-    <el-select size="small" v-model="propdata.areaId" @clear="clearData('area')" clearable placeholder="请选择">
+    <el-select :disabled="disabled" size="small" v-model="propdata.areaId" @clear="clearData('area')" clearable
+               placeholder="请选择">
       <el-option v-for="item in data.areaData" :key="item.value" :label="item.label" :value="item.value"></el-option>
     </el-select>
   </div>
@@ -27,7 +30,7 @@
         },
       }
     },
-    props: ['propdata', 'startArea'],
+    props: ['propdata', 'startArea', 'disabled'],//propdata数据对象 startarea 初始地区id disabled是否禁用
     methods: {
       getProvince(){
         var vm = this;

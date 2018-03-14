@@ -61,8 +61,15 @@ import TerminalError from '../components/TerminalError' //终端异常管理
 import TerminalAdd from '../components/TerminalAdd' //终端申请
 
 import AppCarousel from '../components/appmanage/Carousel.vue'//轮播广告管理
+import AppCarouselAdd from '../components/appmanage/CarouselAdd.vue' //新增轮播广告
+import AppCarouselUpdate from '../components/appmanage/CarouselUpdate.vue' //新增轮播广告
 import AppNews from '../components/appmanage/News.vue' //新闻资讯管理
+import AppNewsAdd from '../components/appmanage/NewsAdd.vue' //新增新闻资讯
+import AppNewsUpdate from '../components/appmanage/NewsUpdate.vue' //新增新闻资讯
 import AppFaq from '../components/appmanage/Faq.vue' //常见问题管理
+import AppFaqAdd from '../components/appmanage/FaqAdd.vue' //常见问题管理
+import AppFaqUpdate from '../components/appmanage/FaqUpdate.vue' //常见问题管理
+
 
 Vue.use(Router)
 
@@ -371,13 +378,37 @@ export default new Router({
           name: 'AppCarousel',
           component: AppCarousel
         }, {
+          path: '/carouseladd',
+          name: 'AppCarouselAdd',
+          component: AppCarouselAdd
+        }, {
+          path: '/carouselupdate',
+          name: 'AppCarouselUpdate',
+          component: AppCarouselUpdate
+        }, {
           path: '/news',
           name: 'AppNews',
           component: AppNews
         }, {
+          path: '/newsadd',
+          name: 'AppNewsAdd',
+          component: AppNewsAdd
+        }, {
+          path: '/newsupdate',
+          name: 'AppNewsUpdate',
+          component: AppNewsUpdate
+        }, {
           path: '/faq',
           name: 'AppFaq',
           component: AppFaq
+        }, {
+          path: '/faqadd',
+          name: 'AppFaqAdd',
+          component: AppFaqAdd
+        }, {
+          path: '/faqupdate',
+          name: 'AppFaqUpdate',
+          component: AppFaqUpdate
         }
       ]
     }

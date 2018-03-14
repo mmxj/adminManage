@@ -5,15 +5,7 @@
       <el-col :span="6">
         <!--<div class="distpicker"><v-distpicProvinceince="省" city="市" area="区"></v-distpicker></div>-->
         <div class="distpicker">
-          <select name="" id="province" @change="setCity">
-            <option v-for="data in provinceData" v-bind:value="data.id">{{data.name}}</option>
-          </select>
-          <select name="" id="city" @change="setDistrict">
-            <option v-for="data in cityData" v-bind:value="data.id">{{data.name}}</option>
-          </select>
-          <select name="" id="district" @change="setDistrict">
-            <option v-for="datas in districtData" v-bind:value="datas.id">{{datas.name}}</option>
-          </select>
+          <Province :propdata="inputData"></Province>
         </div>
       </el-col>
       <!--<el-col :span="6">-->
@@ -88,93 +80,22 @@
 </template>
 <script type="text/javascript">
   import {mapGetters, mapActions} from 'vuex'
+  import Province from '@/common/Province'
   import '@/assets/js/jquery-table2excel.js'
   export default{
+    components: {
+      Province
+    },
     data(){
       return {
-        provinceData: [{'name': '省'}],
-        cityData: [{'name': '市'}],
-        districtData: [{'name': '区'}],
-        session: null,
         tableData: [],
         MerchantUp: null,
-        areaId: null,
+        inputData: {},
         ev: null
       }
     },
     computed: mapGetters(['saveSession']),
     methods: {
-      //地市联动方法 //找个时间封装
-      getArea(){
-        this.session = sessionStorage.getItem('session');//本地存储保存session状态
-        var _this = this;
-        var getArea = new RemoteCall();
-        getArea.init({
-          router: "/base/area/idname/get",
-          session: this.session,
-          data: {
-            parentAreaId: 0
-          },
-          callback: function (data) {
-            if (data.ret.errorCode === 0) {
-              _this.provinceData = data.rows;
-              _this.$nextTick(function () {
-                _this.setCity();
-              })
-            }
-          }
-        });
-      },
-      setCity(){
-        var _this = this;
-        var mySelect = document.getElementById('Province');
-        var index = mySelect.selectedIndex;
-        var parentId = mySelect.getElementsByTagName('option')[index].value;
-        var getCity = new RemoteCall();
-        getCity.init({
-          router: "/base/area/idname/get",
-          session: this.session,
-          data: {
-            parentAreaId: parentId
-          },
-          callback: function (data) {
-            if (data.ret.errorCode === 0) {
-              _this.cityData = data.rows;
-              _this.$nextTick(function () {
-                _this.setDistrict();
-              })
-            }
-          }
-        });
-      },
-      setDistrict(){
-        var _this = this;
-        var myCity = document.getElementById('city');
-        var index = myCity.selectedIndex;
-        var parentId = myCity.getElementsByTagName('option')[index].value; //获取父级option的value值
-        //调用ajax方法
-        var getDistrict = new RemoteCall();
-        getDistrict.init({
-          router: "/base/area/idname/get",
-          session: this.session,
-          data: {
-            parentAreaId: parentId
-          },
-          callback: function (data) {
-            if (data.ret.errorCode === 0) {
-              _this.districtData = data.rows;
-              _this.$nextTick(function () {
-                var myArea = document.getElementById('district');
-                var indexs = myArea.selectedIndex;
-                _this.areaId = myArea.getElementsByTagName('option')[indexs].value;
-                ////            获取本身的option的value值
-              })
-            }
-          }
-        });
-
-      },
-      //地市联动结束
       importf(e) {//导入
         var vm = this;
         if (e.currentTarget.files.length > 0) {
@@ -401,7 +322,7 @@
                 remark: _this.tableData[i].remark,
                 socialSecurityCode: _this.tableData[i].socialSecurityCode,
                 enableFlag: 1,
-                areaId: vm.areaId
+                areaId: vm.inputData.areaId
               },
               callback: function (data) {
                 if (data.ret.errorCode === 0) {
@@ -442,7 +363,6 @@
       }
     },
     mounted: function () {
-      this.getArea()
     }
   }
 </script>

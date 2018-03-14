@@ -2,18 +2,33 @@
   <div id="TerminalError">
     <div class="form-wrap">
       <el-form :inline="true">
-        <el-form-item label="商户名称" label-width="100px">
-          <el-input v-model="form.name" placeholder="请输入商户名称"></el-input>
+        <el-form-item label="异常预警时间" label-width="140px">
+          <!--<el-input v-model="form.name" placeholder="请输入商户名称"></el-input>-->
+          <el-date-picker
+            v-model="timeValue"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期">
+          </el-date-picker>
         </el-form-item>
-        <el-form-item label="终端编号" label-width="100px">
-          <el-input v-model="form.number" placeholder="请输入终端编号"></el-input>
+        <el-form-item label="终端号" label-width="140px">
+          <el-input v-model="form.terminalNo" size="small" placeholder="请输入终端号"></el-input>
         </el-form-item>
-        <el-form-item label="安装地址" label-width="100px">
-          <el-input v-model="form.address" placeholder="请输入安装地址"></el-input>
+        <el-form-item label="终端状态" label-width="140px">
+          <!--<el-input v-model="form."  size="small" placeholder=""></el-input>-->
+          <el-select v-model="form.enableFlag" clearable placeholder="请选择">
+            <el-option
+              v-for="item in enableFlagOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item>
           <div class="button-wrap">
-            <el-button>查询</el-button>
+            <el-button @click="search">查询</el-button>
           </div>
         </el-form-item>
       </el-form>
@@ -171,6 +186,15 @@
   export default{
     data(){
       return {
+        enableFlagOptions: [
+          {
+            value: 0,
+            label: '交易禁止'
+          }, {
+            value: 1,
+            label: '已生效'
+          }
+        ],
         outerVisible: false,
         innerVisible: false,
         currentPage: 1,
@@ -264,7 +288,8 @@
             status: 1,
             explain: 10,
           },
-        ]
+        ],
+        timeValue: null,
       }
     },
     methods: {
@@ -275,6 +300,9 @@
       },
       handleCurrentChange(val){
         console.log('当前页' + val)
+      },
+      search(){
+//          console.log(this.timeValue[0])
       }
     }
   }
@@ -292,10 +320,11 @@
     height: 30px;
     line-height: 0px;
     marign-top: 3px;
+    margin-left: 40px;
   }
 
   .el-input {
-    width: 200px;
+    width: 220px;
   }
 
   .button-wrap {
@@ -312,6 +341,7 @@
     color: #1890ff;
     padding: 0 10px;
     cursor: pointer;
+    text-decoration: underline;
   }
 
   .deal {
@@ -337,6 +367,7 @@
   }
 </style>
 <style>
+
   .innerdialog .el-dialog--small {
     width: 30%;
   }
@@ -357,7 +388,7 @@
   }
 
   #TerminalError .el-form-item {
-    margin-right: 50px;
+    margin-right: 10px;
     margin-bottom: 10px;
   }
 
@@ -385,5 +416,15 @@
     width: 14px;
     height: 14px;
     margin-left: 10px;
+  }
+</style>
+<style lang="scss">
+  #TerminalError {
+    .el-date-picker {
+      width: 322px !important;
+    }
+    .el-picker-panel {
+      width: 322px !important;
+    }
   }
 </style>

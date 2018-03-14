@@ -16,18 +16,7 @@
         </el-col>
         <el-col :span="6">
           <div class="distpicker">
-            <select name="" id="province" @change="setCity()">
-              <option value="">省</option>
-              <option v-for="data in provinceData" v-bind:value="data.id">{{data.name}}</option>
-            </select>
-            <select name="" id="city" @change="setDistrict()">
-              <option value="">市</option>
-              <option v-for="data in cityData" v-bind:value="data.id">{{data.name}}</option>
-            </select>
-            <select name="" id="district" @change="setAreaId()">
-              <option value="">区</option>
-              <option v-for="datas in districtData" v-bind:value="datas.id">{{datas.name}}</option>
-            </select>
+            <Province :propdata="inputData"></Province>
           </div>
         </el-col>
         <el-col :span="2">
@@ -95,7 +84,11 @@
   </div>
 </template>
 <script>
+  import Province from '@/common/Province'
   export default{
+    components: {
+      Province
+    },
     data() {
       return {
         provinceData: [{'name': '省', id: null}],
@@ -170,99 +163,6 @@
         this.currentPage = val;
         this.dataUp()
       },
-      //地区获取
-      getArea(){
-        if (sessionStorage.getItem('session')) {
-          this.session = sessionStorage.getItem('session');//获取本地存储保存session状态
-        } else {
-          this.$router.push({path: '/login'})
-        }
-        var _this = this;
-        var getArea = new RemoteCall();
-        getArea.init({
-          router: "/base/area/idname/get",
-          session: _this.session,
-          data: {
-            parentAreaId: 0
-          },
-          callback: this.getAreaCallback
-        });
-      },
-      getAreaCallback(data){
-        var _this = this;
-        this.provinceData = data.rows
-//        clearTimeout(timer)
-//        var timer = setTimeout(function () {
-////          _this.setCity();
-//        }, 0)
-        this.$nextTick(function () {
-          _this.setCity();
-        })
-      },
-      setCity(){
-        var _this = this;
-        var mySelect = document.getElementById('Province');
-        var index = mySelect.selectedIndex;
-        var parentId = mySelect.getElementsByTagName('option')[index].value;
-        if (parentId != "") {
-          var getCity = new RemoteCall();
-          getCity.init({
-            router: "/base/area/idname/get",
-            session: this.session,
-            data: {
-              parentAreaId: parentId
-            },
-            callback: function (data) {
-              if (data.ret.errorCode === 0) {
-                _this.cityData = getCity.res.rows;
-                _this.$nextTick(function () {
-                  _this.setDistrict();
-                })
-              }
-            }
-          });
-        }
-//        clearTimeout(timer);
-//        var timer = setTimeout(function () {
-//
-//        }, 10)
-      },
-      setDistrict(){//县区获取
-        var myCity = document.getElementById('city');
-        var index = myCity.selectedIndex;
-        var _this = this;
-        var parentId = myCity.getElementsByTagName('option')[index].value;
-        if (parentId != "") {
-          var getDistrict = new RemoteCall();
-          getDistrict.init({
-            router: "/base/area/idname/get",
-            session: this.session,
-            data: {
-              parentAreaId: parentId
-            },
-            callback: function (data) {
-              if (data.ret.errorCode === 0) {
-                _this.districtData = getDistrict.res.rows;
-                _this.$nextTick(function () {
-                  _this.setAreaId();
-                })
-              }
-            }
-          });
-        }
-      },
-      setAreaId(){//获取areaid 给inputData赋值
-        var myCity = document.getElementById('district');
-        var index = myCity.selectedIndex;
-        var parentId = myCity.getElementsByTagName('option')[index].value;
-        if (parentId != "") {
-          this.inputData.areaId = parentId;
-        } else {
-          this.inputData.areaId = null
-        }
-
-      },
-      //地市联动结束
       dataUp(){ //提交查找
         if (this.inputData.areaId == "") {
           this.inputData.areaId = null;
@@ -318,7 +218,6 @@
       }
     },
     mounted: function () {
-      this.getArea();
     }
   }
 </script>

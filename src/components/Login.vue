@@ -78,7 +78,6 @@
         })
       },
       getCodeCallback(data){
-        console.log(data);
         document.getElementById("auth").src = "data:image/png;base64," + data.validateCode;
         this.validateCodeId = data.validateCodeId;
       },

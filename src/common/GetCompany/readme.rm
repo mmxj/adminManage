@@ -27,4 +27,7 @@ export default {
   props:['data','type']
 }
 
+~~~~~~~~~~~~~~~~~~
+
+返回值 name和id
 版本：1.0.0

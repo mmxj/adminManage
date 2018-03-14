@@ -13,7 +13,7 @@
 
 <script>
   export default {
-    props: ['data', 'type', 'holder'],
+    props: ['data', 'type', 'holder', 'start'],//data接受的存储数据的对象，type请求的公司类型，holder为空时的提示语，start初始的公司名称
     data() {
       return {
         session: sessionStorage.getItem('session'),
@@ -95,7 +95,7 @@
                 options.value = item.name;
                 options.id = item.id;
                 array.push(options)
-              })
+              });
             }
           }
         })
@@ -116,6 +116,9 @@
           if (results.length > 0) {
             if (queryString == results[0].name) {
               this.data.id = results[0].id
+            } else {
+              console.log(1111)
+              this.data.id = null;
             }
           }
           cb(results);
@@ -131,7 +134,22 @@
       }
     },
     mounted() {
-      this.restaurants = this.loadAll();
+      var vm = this;
+      vm.restaurants = vm.loadAll();
+      if (vm.start) {
+        vm.$set(vm.data, 'name', vm.start);
+      }
+    },
+    watch: {
+      start(){
+        var vm = this;
+        vm.$set(vm.data, 'name', vm.start);
+        if (vm.start == '' || vm.start == null) {
+          vm.restaurants = vm.loadAll();
+        }
+//        vm.restaurants = vm.loadAll(vm.start);
+////        vm.data.name=vm.start;
+      },
     }
   };
 </script>

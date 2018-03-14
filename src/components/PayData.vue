@@ -159,7 +159,7 @@
     <el-pagination
       @current-change="handleCurrentChange"
       :current-page="currentPage"
-      :page-size="20"
+      :page-size="10"
       layout="total,prev,pager,next,jumper"
       :total="total"
     ></el-pagination>
@@ -206,7 +206,7 @@
           beginCreate: null,
           endCreate: null,
           pageInfo: {
-            pageSize: 20,
+            pageSize: 10,
             pageNum: 1
           }
         },

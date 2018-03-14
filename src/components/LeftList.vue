@@ -39,20 +39,21 @@
             {{listArr[34]}}
           </el-menu-item>
         </el-submenu>
-        <el-submenu index="1-3" v-if="listArrName[43]==showArrName[43]">
-          <template slot="title"> {{listArrName[43]}}</template>
-          <el-menu-item index="/collaborate" class="menu-border-bottom el-lvthree"
-                        v-if="listArrName[5]==showArrName[5]" @click="getIndex(5)">
-            {{listArr[5]}}
-          </el-menu-item>
-          <el-menu-item index="/collaborateadd" class="menu-border-bottom el-lvthree"
-                        v-if="listArrName[6]==showArrName[6]" @click="getIndex(6)">{{listArr[6]}}
-          </el-menu-item>
-          <el-menu-item index="/collaboratecheck" class="menu-border-bottom el-lvthree"
-                        v-if="listArrName[7]==showArrName[7]" @click="getIndex(7)">
-            {{listArr[7]}}
-          </el-menu-item>
-        </el-submenu>
+        <!--合作行业 暂时不需要-->
+        <!--<el-submenu index="1-3" v-if="listArrName[43]==showArrName[43]">-->
+        <!--<template slot="title"> {{listArrName[43]}}</template>-->
+        <!--<el-menu-item index="/collaborate" class="menu-border-bottom el-lvthree"-->
+        <!--v-if="listArrName[5]==showArrName[5]" @click="getIndex(5)">-->
+        <!--{{listArr[5]}}-->
+        <!--</el-menu-item>-->
+        <!--<el-menu-item index="/collaborateadd" class="menu-border-bottom el-lvthree"-->
+        <!--v-if="listArrName[6]==showArrName[6]" @click="getIndex(6)">{{listArr[6]}}-->
+        <!--</el-menu-item>-->
+        <!--<el-menu-item index="/collaboratecheck" class="menu-border-bottom el-lvthree"-->
+        <!--v-if="listArrName[7]==showArrName[7]" @click="getIndex(7)">-->
+        <!--{{listArr[7]}}-->
+        <!--</el-menu-item>-->
+        <!--</el-submenu>-->
         <!--部门管理-->
         <el-submenu index="4-7" v-if="listArrName[34]==showArrName[34]">
           <template slot="title">{{listArrName[34]}}</template>
@@ -90,8 +91,11 @@
           <el-menu-item index="/terminalmanage" class="menu-border-bottom el-lvthree"
                         v-if="listArrName[32]==showArrName[32]" @click="getIndex(32)">{{listArr[32]}}
           </el-menu-item>
-          <el-menu-item index="/terminalpassword" class="menu-border-bottom el-lvthree"
-                        @click="getIndex(35)">{{listArr[35]}}
+          <!--<el-menu-item index="/terminalpassword" class="menu-border-bottom el-lvthree"-->
+          <!--@click="getIndex(35)">{{listArr[35]}}-->
+          <!--</el-menu-item>-->
+          <el-menu-item index="/terminaladd" class="menu-border-bottom el-lvthree"
+                        @click="getIndex(41)">{{listArr[41]}}
           </el-menu-item>
           <el-menu-item index="/terminalaudit" class="menu-border-bottom el-lvthree"
                         @click="getIndex(36)">{{listArr[36]}}
@@ -105,12 +109,13 @@
       <el-menu-item index="/order" class="menu-border-bottom" v-if="listArrName[8]==showArrName[8]"
                     @click="getIndex(8)">{{listArr[8]}}
       </el-menu-item>
-      <el-submenu index="3" v-if="listArrName[35]==showArrName[35]">
-        <template slot="title">{{listArrName[35]}}</template>
-        <el-menu-item index="/channel" class="menu-border-bottom el-lvtwo" v-if="listArrName[9]==showArrName[9]"
-                      @click="getIndex(9)">{{listArr[9]}}
-        </el-menu-item>
-      </el-submenu>
+      <!--产品管理 暂时不需要-->
+      <!--<el-submenu index="3" v-if="listArrName[35]==showArrName[35]">-->
+      <!--<template slot="title">{{listArrName[35]}}</template>-->
+      <!--<el-menu-item index="/channel" class="menu-border-bottom el-lvtwo" v-if="listArrName[9]==showArrName[9]"-->
+      <!--@click="getIndex(9)">{{listArr[9]}}-->
+      <!--</el-menu-item>-->
+      <!--</el-submenu>-->
       <el-submenu index="4" v-if="listArrName[36]==showArrName[36]">
         <template slot="title">{{listArrName[36]}}</template>
         <el-menu-item index="/uploaddir" class="menu-border-bottom el-lvtwo" v-if="listArrName[10]==showArrName[10]"
@@ -151,7 +156,7 @@
         </el-submenu>
       </el-submenu>
       <!--app客户端管理-->
-      <el-submenu index="7">
+      <el-submenu index="9">
         <template slot="title">{{listArrName[50]}}</template>
         <el-menu-item index="/carousel" class="menu-border-bottom el-lvtwo"
                       @click="getIndex(38)">
@@ -159,7 +164,7 @@
         </el-menu-item>
         <el-menu-item index="/news" class="menu-border-bottom el-lvtwo"
                       @click="getIndex(39)">
-          {{listArr[38]}}
+          {{listArr[39]}}
         </el-menu-item>
         <el-menu-item index="/faq" class="menu-border-bottom el-lvtwo"
                       @click="getIndex(40)">
@@ -185,12 +190,12 @@
         <el-menu-item index="/systemmange" class="menu-border-bottom el-lvtwo" v-if="listArrName[23]==showArrName[23]"
                       @click="getIndex(23)">{{listArr[23]}}
         </el-menu-item>
-        <el-menu-item index="/resourceadd" class="menu-border-bottom el-lvtwo" v-if="listArrName[24]==showArrName[24]"
-                      @click="getIndex(24)">{{listArr[24]}}
-        </el-menu-item>
-        <el-menu-item index="/systemmaintenance" class="menu-border-bottom el-lvtwo"
-                      v-if="listArrName[28]==showArrName[28]" @click="getIndex(28)">{{listArr[28]}}
-        </el-menu-item>
+        <!--<el-menu-item index="/resourceadd" class="menu-border-bottom el-lvtwo" v-if="listArrName[24]==showArrName[24]"-->
+        <!--@click="getIndex(24)">{{listArr[24]}}-->
+        <!--</el-menu-item>-->
+        <!--<el-menu-item index="/systemmaintenance" class="menu-border-bottom el-lvtwo"-->
+        <!--v-if="listArrName[28]==showArrName[28]" @click="getIndex(28)">{{listArr[28]}}-->
+        <!--</el-menu-item>-->
       </el-submenu>
     </el-menu>
   </div>
@@ -205,12 +210,12 @@
         listArr: ['用户管理', '管理商户', '添加新商户', '查阅商户证件', '导入商户信息', '管理合作行业', '新增合作行业客户', '查阅行业客户证件', '订单管理', '产品通道基础管理',
           '三大目录上传', '三大目录列表', '三大目录管理', '添加卫生站', '管理卫生站', '添加村医', '管理村医', '业务专区发布', '信息专区发布', '支付流水数据',
           '绑卡数据管理', '数据报表', '添加终端', '系统用户管理', '系统资源管理', '添加员工', '添加部门', '添加角色', '系统维护', '管理部门',
-          '管理角色', '管理员工', '终端管理', '用户导入', '导入银联证书', '终端密匙管理', '终端申请审核管理', '终端异常管理', '轮播广告管理', '新闻资讯管理', '常见问题管理'],//最后的是40
+          '管理角色', '管理员工', '终端管理', '用户导入', '导入银联证书', '终端密匙管理', '终端申请审核管理', '终端异常管理', '轮播广告管理', '新闻资讯管理', '常见问题管理', '终端申请管理'],//最后的是41
         listUrl: ['/user', '/merchant', '/merchantadd', '/merchantcheck', '/merchantchannel', '/collaborate', '/collaborateadd', '/collaboratecheck',
           '/order', '/channel', '/uploaddir', '/dirlist', '/dirmanage', '/healthstationadd', '/healthstation', '/doctoradd', '/doctormanage',
           '/businessissue', '/informationup', '/paydata', '/dataadministration', '/datareport', '/terminal', '/systemmange', '/resourceadd', '/staff',
           '/department', '/roleadd', '/systemmaintenance', '/departmentmanage', '/rolemanage', '/staffmanage', '/terminalmanage', '/userchannel', '/importbankpfx', '/terminalPasswrod',
-          '/terminalaudit', '/terminalerror', '/carousel', '/news', '/faq'],//staff是25 //最后为40
+          '/terminalaudit', '/terminalerror', '/carousel', '/news', '/faq', '/terminaladd'],//staff是25 //最后为41
         saveList: [],
         saveUrl: [],
         listArrName: ['用户管理', '管理商户', '添加新商户', '查阅商户证件', '导入商户信息', '管理合作行业', '新增合作行业客户', '查阅行业客户证件', '订单管理', '产品通道基础管理',
@@ -218,7 +223,7 @@
           '绑卡数据管理', '数据报表', '添加终端', '系统用户管理', '系统资源管理', '添加员工', '添加部门', '添加角色', '系统维护', '管理部门',
           '管理角色', '管理员工', '终端管理', '基础信息管理', '部门管理', '产品管理', '医疗后台管理', '卫生站管理', '医疗后台信息发布', '数据管理系统',
           '社保受理终端管理平台', '系统管理', '商户信息', '合作行业', '用户信息', '用户导入', '导入银联证书', '终端密匙管理', '终端申请审核管理', '终端异常管理', 'APP客户端管理',
-          '轮播广告管理', '新闻资讯管理', '常见问题管理'],//53
+          '轮播广告管理', '新闻资讯管理', '常见问题管理', '终端申请管理'],//54
         session: sessionStorage.getItem('session'),
         showArrName: []
       }

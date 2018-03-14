@@ -3,24 +3,25 @@
     <div class="form-wrap">
       <el-form :inline="true">
         <el-form-item label="商户名称" label-width="100px">
-          <el-input v-model="form.name" placeholder="请输入商户名称"></el-input>
+          <el-input v-model="form.merchantName" placeholder="请输入商户名称"></el-input>
+          <!--<GetCompany :data="company" :holder="'请输入商户名称'"></GetCompany>-->
         </el-form-item>
-        <el-form-item label="终端编号" label-width="100px">
-          <el-input v-model="form.number" placeholder="请输入终端编号"></el-input>
+        <el-form-item label="终端号" label-width="100px">
+          <el-input v-model="form.terminalNo" placeholder="请输入终端编号"></el-input>
         </el-form-item>
         <el-form-item label="安装地址" label-width="100px">
           <el-input v-model="form.address" placeholder="请输入安装地址"></el-input>
         </el-form-item>
         <el-form-item>
           <div class="button-wrap">
-            <el-button>查询</el-button>
+            <el-button @click="sreach">查询</el-button>
           </div>
         </el-form-item>
       </el-form>
     </div>
-    <div class="apply">
-      <el-button class="apply-button" @click="goRoute">终端申请</el-button>
-    </div>
+    <!--<div class="apply">-->
+    <!--<el-button class="apply-button" @click="goRoute">终端申请</el-button>-->
+    <!--</div>-->
     <div class="table-wrap">
       <el-table
         :data="tableData"
@@ -29,14 +30,14 @@
         :row-key="getRowKeys"
         :expand-row-keys="expands"
       >
-        <el-table-column align="center" label="归属商户" prop="mercial" min-width="100"></el-table-column>
-        <el-table-column align="center" label="商户编号" prop="number" min-width="100"></el-table-column>
-        <el-table-column align="center" label="终端编号" prop="termainalNumber" min-width="100"></el-table-column>
-        <el-table-column align="center" label="终端密钥索引" prop="index" min-width="130"></el-table-column>
-        <el-table-column align="center" label="PSAM卡号" prop="psam" min-width="120"></el-table-column>
+        <el-table-column align="center" label="归属商户" prop="companyName" min-width="100"></el-table-column>
+        <el-table-column align="center" label="商户号" prop="merchantNo" min-width="100"></el-table-column>
+        <el-table-column align="center" label="终端编号" prop="terminalNo" min-width="100"></el-table-column>
+        <el-table-column align="center" label="终端密钥索引" prop="mainKeyId" min-width="130"></el-table-column>
+        <el-table-column align="center" label="PSAM卡号" prop="pSimNo" min-width="120"></el-table-column>
         <el-table-column align="center" label="安装地址" prop="address" min-width="100"
                          show-overflow-tooltip></el-table-column>
-        <el-table-column align="center" label="收单机构" prop="acquirer" min-width="100"></el-table-column>
+        <el-table-column align="center" label="收单机构" prop="acquirerName" min-width="100"></el-table-column>
         <el-table-column align="center" label="详情" min-width="100">
           <template slot-scope="props">
             <span class="button" @click="show(props.$index)">{{props.$index == expands[0] ? '收起' : '展开'}}</span>
@@ -46,7 +47,7 @@
           <template slot-scope="props">
             <el-form label-position="left" inline class="demo-table-expand">
               <el-form-item label="维护公司" label-width="100px">
-                <span>{{props.row.maintain}}</span>
+                <span>{{props.row.maintainCompany}}</span>
               </el-form-item>
               <el-form-item label="终端经纬度" label-width="100px">
                 <span>{{props.row.position}}</span>
@@ -55,19 +56,16 @@
                 <span>{{props.row.agency}}</span>
               </el-form-item>
               <el-form-item label="开通日期" label-width="100px">
-                <span>{{props.row.createDate}}</span>
-              </el-form-item>
-              <el-form-item label="商户主营业务" label-width="100px">
-                <span>{{props.row.business}}</span>
+                <span>{{props.row.sfsCreate}}</span>
               </el-form-item>
               <el-form-item label="终端型号" label-width="100px">
                 <span>{{props.row.model}}</span>
               </el-form-item>
               <el-form-item label="终端厂家" label-width="100px">
-                <span>{{props.row.manufacturers}}</span>
+                <span>{{props.row.terminalCompany}}</span>
               </el-form-item>
               <el-form-item label="终端状态" label-width="100px">
-                <span>{{props.row.status}}</span>
+                <span>{{props.row.enableFlag}}</span>
               </el-form-item>
               <el-form-item label="详细安装地址" label-width="100px" style="width:100%">
                 <span>{{props.row.address}}</span>
@@ -89,201 +87,31 @@
   </div>
 </template>
 <script>
+  import unit from '@/unit/unit.js';
+  import GetCompany from '@/common/GetCompany';
   export default{
+    components: {
+      GetCompany
+    },
     data(){
       return {
         form: {},
+        company: {},
         currentPage: 1,
-        tableData: [
-          {
-            id: 1,
-            mercial: 1111,
-            number: 1111,
-            termainalNumber: 11111,
-            index: 0,
-            psam: 1111,
-            address: '11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111',
-            acquirer: 11111,
-            maintain: 11111,
-            position: 111111,
-            agency: 111111,
-            createDate: 11111,
-            business: 111111,
-            model: 11111,
-            manufacturers: 111111,
-            status: 11111
-          },
-          {
-            id: 2,
-            mercial: 1111,
-            number: 1111,
-            termainalNumber: 11111,
-            index: 1,
-            psam: 1111,
-            address: 1111,
-            acquirer: 11111,
-            maintain: 11111,
-            position: 111111,
-            agency: 111111,
-            createDate: 11111,
-            business: 111111,
-            model: 11111,
-            manufacturers: 111111,
-            status: 11111
-          },
-          {
-            id: 3,
-            mercial: 1111,
-            number: 1111,
-            termainalNumber: 11111,
-            index: 2,
-            psam: 1111,
-            address: 1111,
-            acquirer: 11111,
-            maintain: 11111,
-            position: 111111,
-            agency: 111111,
-            createDate: 11111,
-            business: 111111,
-            model: 11111,
-            manufacturers: 111111,
-            status: 11111
-          },
-          {
-            id: 4,
-            mercial: 1111,
-            number: 1111,
-            termainalNumber: 11111,
-            index: 3,
-            psam: 1111,
-            address: 1111,
-            acquirer: 11111,
-            maintain: 11111,
-            position: 111111,
-            agency: 111111,
-            createDate: 11111,
-            business: 111111,
-            model: 11111,
-            manufacturers: 111111,
-            status: 11111
-          },
-          {
-            id: 5,
-            mercial: 1111,
-            number: 1111,
-            termainalNumber: 11111,
-            index: 4,
-            psam: 1111,
-            address: 1111,
-            acquirer: 11111,
-            maintain: 11111,
-            position: 111111,
-            agency: 111111,
-            createDate: 11111,
-            business: 111111,
-            model: 11111,
-            manufacturers: 111111,
-            status: 11111
-          },
-          {
-            id: 6,
-            mercial: 1111,
-            number: 1111,
-            termainalNumber: 11111,
-            index: 5,
-            psam: 1111,
-            address: 1111,
-            acquirer: 11111,
-            maintain: 11111,
-            position: 111111,
-            agency: 111111,
-            createDate: 11111,
-            business: 111111,
-            model: 11111,
-            manufacturers: 111111,
-            status: 11111
-          },
-          {
-            id: 7,
-            mercial: 1111,
-            number: 1111,
-            termainalNumber: 11111,
-            index: 6,
-            psam: 1111,
-            address: 1111,
-            acquirer: 11111,
-            maintain: 11111,
-            position: 111111,
-            agency: 111111,
-            createDate: 11111,
-            business: 111111,
-            model: 11111,
-            manufacturers: 111111,
-            status: 11111
-          },
-          {
-            id: 8,
-            mercial: 1111,
-            number: 1111,
-            termainalNumber: 11111,
-            index: 7,
-            psam: 1111,
-            address: 1111,
-            acquirer: 11111,
-            maintain: 11111,
-            position: 111111,
-            agency: 111111,
-            createDate: 11111,
-            business: 111111,
-            model: 11111,
-            manufacturers: 111111,
-            status: 11111
-          }, {
-            id: 9,
-            mercial: 1111,
-            number: 1111,
-            termainalNumber: 11111,
-            index: 8,
-            psam: 1111,
-            address: 1111,
-            acquirer: 11111,
-            maintain: 11111,
-            position: 111111,
-            agency: 111111,
-            createDate: 11111,
-            business: 111111,
-            model: 11111,
-            manufacturers: 111111,
-            status: 11111
-          },
-          {
-            id: 10,
-            mercial: 1111,
-            number: 1111,
-            termainalNumber: 11111,
-            index: 9,
-            psam: 1111,
-            address: 1111,
-            acquirer: 11111,
-            maintain: 11111,
-            position: 111111,
-            agency: 111111,
-            createDate: 11111,
-            business: 111111,
-            model: 11111,
-            manufacturers: 111111,
-            status: 11111
-          },
-        ],
+        tableData: [],
+        session: sessionStorage.getItem('session'),
         getRowKeys(row) {
           return row.index
         },
-        expands: []
+        expands: [],
+        total: 0,//总条数
+        pageNum: 1,//单前页码
       }
     },
     methods: {
       handleCurrentChange(val){
-        console.log(`当前页: ${val}`);
+        this.pageNum = val;
+        this.getTerminal()
       },
       show(data){
 
@@ -296,9 +124,74 @@
       },
       goRoute(){
         this.$router.push('/terminaladd')
-      }
+      },
+      getTerminal(){ //获取终端信息
+        var vm = this;
+        vm.tableData = [];
+        var getterminal = new RemoteCall();
+        getterminal.init({
+          router: '/base/terminal/get',
+          session: vm.session,
+          data: {
+            pageInfo: {
+              pageSize: 10,
+              pageNum: vm.pageNum
+            }
+          },
+          callback: function (data) {
+            if (data.ret.errorCode === 0) {
+              if (data.pageInfo.total) {
+                if (data.pageInfo.total > 0) {
+                  vm.total = data.pageInfo.total
+                }
+              } else if (data.pageInfo.total === 0) {
+                vm.total = 0
+              }
+              ;
+              vm.tableData = [];
+              data.rows.forEach(function (item, i) {
+                item.index = i
+                item.enableFlag = unit.enableFlag(item.enableFlag);
+                vm.$set(vm.tableData, i, item)
+              })
+            }
+          }
+        })
+      },//获取终端信息
+      sreach(){//根据条件查询终端信息 缺少地址查询的功能
+//        this.form.companyId=this.company.id;
+        var vm = this;
+        this.form.pageInfo = {
+          pageSize: 10,
+          pageNum: vm.pageNum
+        };
+        unit.removeEmptyString(this.form);
+
+        var searchCompany = new RemoteCall();
+        searchCompany.init({
+          router: '/base/terminal/get',
+          session: vm.session,
+          data: vm.form,
+          callback: function (data) {
+            if (data.pageInfo.total) {
+              if (data.pageInfo.total > 0) {
+                vm.total = data.pageInfo.total
+              }
+            } else if (data.pageInfo.total === 0) {
+              vm.total = 0
+            }
+            vm.tableData = [];
+            data.rows.forEach(function (item, i) {
+              item.index = i;
+              item.enableFlag = unit.enableFlag(item.enableFlag);
+              vm.$set(vm.tableData, i, item)
+            })
+          }
+        })
+      },//根据条件查询
     },
     mounted: function () {
+      this.getTerminal();
     }
   }
 </script>
@@ -378,6 +271,7 @@
     color: #1890ff;
     padding: 0 10px;
     cursor: pointer;
+    text-decoration: underline;
   }
 </style>
 <style>
